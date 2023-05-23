@@ -2,7 +2,9 @@ package types
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
+	"log"
 	"math"
 	"sort"
 	"strings"
@@ -134,6 +136,12 @@ func TestValidatorSetValidateBasic(t *testing.T) {
 		}
 	}
 
+}
+
+func TestSSZ(t *testing.T) {
+	vset := randValidatorSet(10)
+	ssz := vset.SSZ()
+	log.Printf("SSZ serialization %v", ssz)
 }
 
 func TestCopy(t *testing.T) {
