@@ -5,12 +5,14 @@ package types
 
 import (
 	fmt "fmt"
+	io "io"
+	"log"
+	math "math"
+	math_bits "math/bits"
+
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
 	crypto "github.com/tendermint/tendermint/proto/tendermint/crypto"
-	io "io"
-	math "math"
-	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -345,6 +347,7 @@ func (m *Validator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 
 func (m *SimpleValidator) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
+	log.Printf("size %v", size)
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
 	if err != nil {
@@ -363,23 +366,29 @@ func (m *SimpleValidator) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	log.Printf("%v", m.VotingPower)
 	if m.VotingPower != 0 {
 		i = encodeVarintValidator(dAtA, i, uint64(m.VotingPower))
 		i--
 		dAtA[i] = 0x10
 	}
+	log.Printf("after voting power: %v", dAtA)
 	if m.PubKey != nil {
 		{
 			size, err := m.PubKey.MarshalToSizedBuffer(dAtA[:i])
+			log.Printf("size of pubkey %v", size)
 			if err != nil {
 				return 0, err
 			}
+			log.Printf("before putting encoded varint %v", dAtA)
 			i -= size
 			i = encodeVarintValidator(dAtA, i, uint64(size))
 		}
 		i--
 		dAtA[i] = 0xa
 	}
+	log.Printf("after adding pubkey")
+	log.Printf("%v", dAtA)
 	return len(dAtA) - i, nil
 }
 
@@ -390,10 +399,13 @@ func encodeVarintValidator(dAtA []byte, offset int, v uint64) int {
 		dAtA[offset] = uint8(v&0x7f | 0x80)
 		v >>= 7
 		offset++
+		log.Printf("%v", dAtA)
 	}
 	dAtA[offset] = uint8(v)
 	return base
 }
+
+
 func (m *ValidatorSet) Size() (n int) {
 	if m == nil {
 		return 0

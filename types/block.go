@@ -354,6 +354,8 @@ type Header struct {
 	// hashes from the app output from the prev block
 	ValidatorsHash     cmtbytes.HexBytes `json:"validators_hash"`      // validators for the current block
 	NextValidatorsHash cmtbytes.HexBytes `json:"next_validators_hash"` // validators for the next block
+	ValidatorsSSZ      cmtbytes.HexBytes `json:"validators_ssz"`       // validators ssz
+	NextValidatorsSSZ  cmtbytes.HexBytes `json:"next_validators_ssz"`  // next_validators ssz
 	ConsensusHash      cmtbytes.HexBytes `json:"consensus_hash"`       // consensus params for current block
 	AppHash            cmtbytes.HexBytes `json:"app_hash"`             // state after txs from the previous block
 	// root hash of all results from the txs from the previous block
@@ -371,6 +373,7 @@ func (h *Header) Populate(
 	version cmtversion.Consensus, chainID string,
 	timestamp time.Time, lastBlockID BlockID,
 	valHash, nextValHash []byte,
+	valSSZ, nextValSSZ []byte,
 	consensusHash, appHash, lastResultsHash []byte,
 	proposerAddress Address,
 ) {
@@ -380,6 +383,8 @@ func (h *Header) Populate(
 	h.LastBlockID = lastBlockID
 	h.ValidatorsHash = valHash
 	h.NextValidatorsHash = nextValHash
+	h.ValidatorsSSZ = valSSZ
+	h.NextValidatorsSSZ = nextValSSZ
 	h.ConsensusHash = consensusHash
 	h.AppHash = appHash
 	h.LastResultsHash = lastResultsHash
@@ -435,6 +440,16 @@ func (h Header) ValidateBasic() error {
 	if err := ValidateHash(h.NextValidatorsHash); err != nil {
 		return fmt.Errorf("wrong NextValidatorsHash: %v", err)
 	}
+
+	// Basic validation of SSZ Hash related to application data.
+	// Will validate fully against state in state#ValidateBlock.
+	if err := ValidateHash(h.ValidatorsSSZ); err != nil {
+		return fmt.Errorf("wrong ValidatorsHash: %v", err)
+	}
+	if err := ValidateHash(h.NextValidatorsSSZ); err != nil {
+		return fmt.Errorf("wrong NextValidatorsHash: %v", err)
+	}
+
 	if err := ValidateHash(h.ConsensusHash); err != nil {
 		return fmt.Errorf("wrong ConsensusHash: %v", err)
 	}

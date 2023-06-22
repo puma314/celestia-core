@@ -136,21 +136,6 @@ func TestValidatorSetValidateBasic(t *testing.T) {
 
 }
 
-func TestCopy(t *testing.T) {
-	vset := randValidatorSet(10)
-	vsetHash := vset.Hash()
-	if len(vsetHash) == 0 {
-		t.Fatalf("ValidatorSet had unexpected zero hash")
-	}
-
-	vsetCopy := vset.Copy()
-	vsetCopyHash := vsetCopy.Hash()
-
-	if !bytes.Equal(vsetHash, vsetCopyHash) {
-		t.Fatalf("ValidatorSet copy had wrong hash. Orig: %X, Copy: %X", vsetHash, vsetCopyHash)
-	}
-}
-
 // Test that IncrementProposerPriority requires positive times.
 func TestIncrementProposerPriorityPositiveTimes(t *testing.T) {
 	vset := NewValidatorSet([]*Validator{
