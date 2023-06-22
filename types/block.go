@@ -440,6 +440,16 @@ func (h Header) ValidateBasic() error {
 	if err := ValidateHash(h.NextValidatorsHash); err != nil {
 		return fmt.Errorf("wrong NextValidatorsHash: %v", err)
 	}
+
+	// Basic validation of SSZ Hash related to application data.
+	// Will validate fully against state in state#ValidateBlock.
+	if err := ValidateHash(h.ValidatorsSSZ); err != nil {
+		return fmt.Errorf("wrong ValidatorsHash: %v", err)
+	}
+	if err := ValidateHash(h.NextValidatorsSSZ); err != nil {
+		return fmt.Errorf("wrong NextValidatorsHash: %v", err)
+	}
+
 	if err := ValidateHash(h.ConsensusHash); err != nil {
 		return fmt.Errorf("wrong ConsensusHash: %v", err)
 	}
